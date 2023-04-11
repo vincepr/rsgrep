@@ -1,18 +1,18 @@
-use std::{env, fs};
+use std::{process};
+
+use rsgrep::Config;                     // import "OUR"Library:
+
 
 fn main() {
-    // reading args
-    let args: Vec<String> = env::args().collect();  //-> ["pathToBinary/rsgrep", "searchstring", "file.txt"]
-    if args.len() < 2 {
-        panic!("rsgrep: Error need 2 args to run rsgrep")
+    // reading in args:
+    let cfg = Config::init().unwrap_or_else(|err|{
+        println!("rsgrep-Error: {err}");
+        process::exit(1);
+    });
+    if let Err(e) = rsgrep::run(&cfg) { // no need to unwrap here since its only () anyways
+        println!("rsgrep-Error: {e}");
+        process::exit(1);
     }
-    let search = &args[1];
-    let path = &args[2];
-    println!("rsgrep: searching for: {}", search);
-    println!("rsgrep: in file: {}", path);
-
-    //reading a file:
-    let data = fs::read_to_string(path)
-        .expect("rsgrep: Error: cant read file at: {path}");
-    println!("{data}");
+    process::exit(0);
 }
+
