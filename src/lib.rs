@@ -54,11 +54,11 @@ impl Config {
     pub fn init() -> Result<Config, &'static str> {
         // read the Terminal Args. (args[0] is the binary that is ran)
         use std::env;
-        let args: Vec<String> = env::args().collect();  //-> ["pathToBinary/rsgrep", "Searchstring", "file.txt"]
+        let args = env::args();  //-> iterator to: ["pathToBinary/rsgrep", "Searchstring", "file.txt"]
         if args.len() != 3 {
             return Err("need 2 args to run rsgrep successfully")
         }
-        let (query, path) = Config::parse_args(&args);
+        let (query, path) = Config::parse_args(args).unwrap();
 
         // in this case we just check if there is any ENV of the name:
         let ignore_case = env::var("CASE_INSENSITIVE").is_ok();
@@ -70,10 +70,18 @@ impl Config {
             case_insensitive: ignore_case,
         })
     }
-    fn parse_args(args: &Vec<String>) -> (&str, &str){
-        let query = &args[1];
-        let path = &args[2];
-        (query, path)
+    fn parse_args(mut args: impl Iterator<Item=String>) -> Result<(String, String), &'static str>{
+        args.next();    // first element is the binary name and of no interest
+        let query = match args.next(){
+            Some(arg) => arg,
+            None => return Err("Missing first Argument: search-string"),
+        };
+    
+        let path = match args.next(){
+            Some(arg) => arg,
+            None => return Err("Missing 2nd Argument: file-path to search"),
+        };
+        Ok((query, path))
     }
 }
 
