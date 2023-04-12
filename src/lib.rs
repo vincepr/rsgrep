@@ -20,14 +20,22 @@ pub fn run(cfg: &Config) -> Result<(), io::Error >{
 }
 
 /// searches a string for a substring. Returns array of lines that include substing.
+// pub fn search_str<'a>(substr: &str, data: &'a str) -> Vec<&'a str> {
+//     let mut found_lines:Vec<&str> = vec![];
+//     for line in data.lines() {
+//         if line.contains(substr) {
+//             found_lines.push(line);
+//         }
+//     }
+//     found_lines
+// }
+
+// rewritten above with an iterator (more readable)
 pub fn search_str<'a>(substr: &str, data: &'a str) -> Vec<&'a str> {
-    let mut found_lines:Vec<&str> = vec![];
-    for line in data.lines() {
-        if line.contains(substr) {
-            found_lines.push(line);
-        }
-    }
-    found_lines
+    data
+        .lines()
+        .filter(|line| line.contains(substr))
+        .collect()
 }
 
 /// like seach_str() but case insensitive
